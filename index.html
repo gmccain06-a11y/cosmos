@@ -323,59 +323,141 @@
         made with <span class="heart">❤️</span> by gaurav for his love
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+<script>
+    // This is the new, complete script. Use this for the replacement.
+document.addEventListener('DOMContentLoaded', () => {
 
-            // --- 1. CUSTOM CURSOR & MOUSE GLOW ---
-            const cursorGlow = document.querySelector('.cursor-glow');
-            document.addEventListener('mousemove', (e) => {
-                cursorGlow.style.left = e.clientX + 'px';
-                cursorGlow.style.top = e.clientY + 'px';
-            });
+    // --- THIS IS THE NEW PART FOR MUSIC CONTINUITY ---
+    const ambientSound = document.getElementById('ambient-sound');
+    const soundToggle = document.getElementById('sound-toggle');
+    const SAVED_TIME_KEY = 'savedAudioTime';
+    const SOUND_STATE_KEY = 'isSoundOn';
+    let isSoundOn = false;
 
-            // --- 2. GENERATE BACKGROUND STARS ---
-            const starsContainer = document.getElementById('stars-container');
-            for (let i = 0; i < 150; i++) {
-                const star = document.createElement('div');
-                star.className = 'star-bg';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 4 + 's';
-                starsContainer.appendChild(star);
+    // This function saves the music's current time and playing state
+    function saveAudioState() {
+        if (isSoundOn) {
+            localStorage.setItem(SAVED_TIME_KEY, ambientSound.currentTime);
+            localStorage.setItem(SOUND_STATE_KEY, 'true');
+        } else {
+            localStorage.setItem(SOUND_STATE_KEY, 'false');
+        }
+    }
+
+    // This function loads the saved state when the page opens
+    function loadAudioState() {
+        const savedTime = parseFloat(localStorage.getItem(SAVED_TIME_KEY)) || 0;
+        const savedSoundState = localStorage.getItem(SOUND_STATE_KEY) === 'true';
+        
+        ambientSound.currentTime = savedTime;
+
+        if (savedSoundState) {
+            ambientSound.play().catch(e => console.error("Autoplay failed:", e));
+            soundToggle.textContent = '🔊';
+            isSoundOn = true;
+        } else {
+            soundToggle.textContent = '🔇';
+            isSoundOn = false;
+        }
+    }
+
+    // Load the state when the page first loads
+    loadAudioState();
+
+    // Save the state every second while the page is open
+    setInterval(saveAudioState, 1000); 
+    
+    // Save the state right before the user leaves the page
+    window.addEventListener('beforeunload', saveAudioState);
+
+    // --- THIS IS THE MODIFIED SOUND TOGGLE LOGIC ---
+    // It now also calls saveAudioState() when you click it.
+    soundToggle.addEventListener('click', () => {
+        if (isSoundOn) {
+            ambientSound.pause();
+            soundToggle.textContent = '🔇';
+        } else {
+            ambientSound.play().catch(e => console.error("Audio play failed:", e));
+            soundToggle.textContent = '🔊';
+        }
+        isSoundOn = !isSoundOn;
+        saveAudioState(); // <-- NEW LINE: Save state immediately on toggle
+    });
+
+
+    // --- ALL THE CODE BELOW IS THE SAME AS BEFORE ---
+    // --- (Custom Cursor, Stars, Scroll-Reveal, Constellation) ---
+
+    const cursorGlow = document.querySelector('.cursor-glow');
+    document.addEventListener('mousemove', (e) => {
+        cursorGlow.style.left = e.clientX + 'px';
+        cursorGlow.style.top = e.clientY + 'px';
+    });
+
+    const starsContainer = document.getElementById('stars-container');
+    for (let i = 0; i < 150; i++) {
+        const star = document.createElement('div');
+        star.className = 'star-bg';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 4 + 's';
+        starsContainer.appendChild(star);
+    }
+
+    const scenes = document.querySelectorAll('.scene');
+    const observerOptions = { root: null, rootMargin: '0px', threshold: 0.3 };
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
             }
-
-            // --- 3. SCROLL-REVEAL ANIMATIONS ---
-            const scenes = document.querySelectorAll('.scene');
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.3
-            };
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, observerOptions);
-            scenes.forEach(scene => observer.observe(scene));
-
-            // --- 4. SOUND CONTROL ---
-            const soundToggle = document.getElementById('sound-toggle');
-            const ambientSound = document.getElementById('ambient-sound');
-            let isSoundOn = false;
-            soundToggle.addEventListener('click', () => {
-                if (isSoundOn) {
-                    ambientSound.pause();
-                    soundToggle.textContent = '🔇';
-                } else {
-                    ambientSound.play().catch(e => console.error("Audio play failed:", e));
-                    soundToggle.textContent = '🔊';
-                }
-                isSoundOn = !isSoundOn;
-            });
-
         });
-    </script>
+    }, observerOptions);
+    scenes.forEach(scene => observer.observe(scene));
+
+    const constellationSection = document.getElementById('constellation');
+    if (constellationSection) {
+        const stars = constellationSection.querySelectorAll('.star');
+        const svg = document.getElementById('constellation-svg');
+        const linesGroup = document.getElementById('lines');
+        const memoryPopup = document.getElementById('memory-popup');
+        const memoryText = memoryPopup.querySelector('.memory-text');
+        let lastStar = null;
+
+        stars.forEach(star => {
+            star.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const rect = star.getBoundingClientRect();
+                const svgRect = svg.getBoundingClientRect();
+                const x1 = rect.left + rect.width / 2 - svgRect.left;
+                const y1 = rect.top + rect.height / 2 - svgRect.top;
+
+                if (lastStar && lastStar !== star) {
+                    const lastRect = lastStar.getBoundingClientRect();
+                    const x2 = lastRect.left + lastRect.width / 2 - svgRect.left;
+                    const y2 = lastRect.top + lastRect.height / 2 - svgRect.top;
+
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+                    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+                    linesGroup.appendChild(line);
+
+                    star.classList.add('connected');
+                    lastStar.classList.add('connected');
+                }
+
+                memoryText.textContent = star.dataset.memory;
+                memoryPopup.style.left = rect.left + rect.width / 2 + 'px';
+                memoryPopup.style.top = rect.top - 60 + 'px';
+                memoryPopup.style.transform = 'translate(-50%, 0)';
+                memoryPopup.classList.add('show');
+                setTimeout(() => { memoryPopup.classList.remove('show'); }, 3000);
+
+                lastStar = star;
+            });
+        });
+    }
+});
+</script>
 </body>
 </html>
