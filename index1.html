@@ -475,7 +475,7 @@
     </style>
 </head>
 <body>
-
+<iframe src="play.html" id="music-player" style="display:none;"></iframe>
     <a href="index.html" class="back-button"><span>←</span> Back to Your Universe</a>
 
     <!-- Custom Cursor Elements -->
@@ -606,7 +606,30 @@
 
     <!-- ===== JAVASCRIPT ===== -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+
+        
+document.addEventListener('DOMContentLoaded', () => {
+    const soundToggle = document.getElementById('sound-toggle');
+    let isSoundOn = false;
+
+    soundToggle.addEventListener('click', () => {
+        // Get the iframe's window and call the function inside it
+        const musicFrame = document.getElementById('music-player').contentWindow;
+        musicFrame.toggleMusic();
+
+        // Update the button icon
+        if (isSoundOn) {
+            soundToggle.textContent = '🔇';
+        } else {
+            soundToggle.textContent = '🔊';
+        }
+        isSoundOn = !isSoundOn;
+    });
+
+    // --- Add any other scripts for this page below ---
+});
+
+        
 
             // --- Custom Cursor Logic ---
             const cursor = document.querySelector('.cursor');
@@ -773,7 +796,7 @@
                     nebula3.style.transform = `translate(${-x * 10}px, ${y * 10}px)`;
                 }
             });
-        });
+        
     </script>
 
 </body>
