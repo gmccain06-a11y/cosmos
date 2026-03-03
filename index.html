@@ -248,6 +248,31 @@
             50% { transform: translateY(-20px); }
         }
 
+        /* --- Footer Attribution --- */
+        .attribution {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 0.85rem;
+            color: rgba(240, 240, 240, 0.6);
+            font-family: var(--font-body);
+            z-index: 1000;
+            text-align: right;
+            animation: fadeIn 2s ease-in;
+        }
+        .attribution .heart {
+            color: #ff6b6b;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         /* --- Responsive Design --- */
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
@@ -258,6 +283,11 @@
             .event-horizon { width: 70px; height: 70px; }
             .cursor-glow { display: none; } /* Hide custom cursor on mobile */
             body { cursor: auto; }
+            .attribution {
+                font-size: 0.75rem;
+                bottom: 10px;
+                right: 10px;
+            }
         }
     </style>
 </head>
@@ -265,11 +295,11 @@
 
     <!-- --- PERSONALIZE THIS: Add your own sound file --- -->
     <!-- Find a royalty-free ambient space track, save it as 'cosmos.mp3' in the same folder as this HTML file -->
-    <!-- Add this line -->
-<iframe src="play.html" id="music-player" style="display:none;"></iframe>
-
-<!-- This button was already there -->
-<button id="sound-toggle">🔇</button>
+    <audio id="ambient-sound" loop>
+        <source src="cosmos.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <button id="sound-toggle">🔇</button>
 
     <div class="stars-container" id="stars-container"></div>
     <div class="cursor-glow"></div>
@@ -318,116 +348,64 @@
         </section>
     </main>
 
-     <!-- Attribution -->
+    <!-- Attribution -->
     <div class="attribution">
         made with <span class="heart">❤️</span> by gaurav for his love
     </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. MUSIC CONTINUITY LOGIC (iframe method) ---
-    const soundToggle = document.getElementById('sound-toggle');
-    let isMusicPlaying = false;
-
-    soundToggle.addEventListener('click', () => {
-        const musicFrame = document.getElementById('music-player').contentWindow;
-        
-        // Check if the iframe has loaded before trying to call its function
-        if (musicFrame && musicFrame.toggleMusic) {
-            musicFrame.toggleMusic(); // Call the function inside play.html
-
-            // Update the button icon on the main page
-            if (isMusicPlaying) {
-                soundToggle.textContent = '🔇';
-            } else {
-                soundToggle.textContent = '🔊';
-            }
-            isMusicPlaying = !isMusicPlaying;
-        } else {
-            console.error("Music player iframe not ready yet.");
-        }
-    });
-
-
-    // --- 2. CUSTOM CURSOR LOGIC ---
-    const cursorGlow = document.querySelector('.cursor-glow');
-    document.addEventListener('mousemove', (e) => {
-        cursorGlow.style.left = e.clientX + 'px';
-        cursorGlow.style.top = e.clientY + 'px';
-    });
-
-
-    // --- 3. BACKGROUND STARS ---
-    const starsContainer = document.getElementById('stars-container');
-    for (let i = 0; i < 150; i++) {
-        const star = document.createElement('div');
-        star.className = 'star-bg';
-        star.style.left = Math.random() * 100 + '%';
-        star.style.top = Math.random() * 100 + '%';
-        star.style.animationDelay = Math.random() * 4 + 's';
-        starsContainer.appendChild(star);
-    }
-
-
-    // --- 4. SCROLL-REVEAL ANIMATIONS ---
-    const scenes = document.querySelectorAll('.scene');
-    const observerOptions = { root: null, rootMargin: '0px', threshold: 0.3 };
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, observerOptions);
-    scenes.forEach(scene => observer.observe(scene));
-
-
-    // --- 5. INTERACTIVE CONSTELLATION (if you have a constellation section) ---
-    const constellationSection = document.getElementById('constellation');
-    if (constellationSection) {
-        const stars = constellationSection.querySelectorAll('.star');
-        const svg = document.getElementById('constellation-svg');
-        const linesGroup = document.getElementById('lines');
-        const memoryPopup = document.getElementById('memory-popup');
-        const memoryText = memoryPopup.querySelector('.memory-text');
-        let lastStar = null;
-
-        stars.forEach(star => {
-            star.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const rect = star.getBoundingClientRect();
-                const svgRect = svg.getBoundingClientRect();
-                const x1 = rect.left + rect.width / 2 - svgRect.left;
-                const y1 = rect.top + rect.height / 2 - svgRect.top;
-
-                if (lastStar && lastStar !== star) {
-                    const lastRect = lastStar.getBoundingClientRect();
-                    const x2 = lastRect.left + lastRect.width / 2 - svgRect.left;
-                    const y2 = lastRect.top + lastRect.height / 2 - svgRect.top;
-
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-                    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-                    linesGroup.appendChild(line);
-
-                    star.classList.add('connected');
-                    lastStar.classList.add('connected');
-                }
-
-                memoryText.textContent = star.dataset.memory;
-                memoryPopup.style.left = rect.left + rect.width / 2 + 'px';
-                memoryPopup.style.top = rect.top - 60 + 'px';
-                memoryPopup.style.transform = 'translate(-50%, 0)';
-                memoryPopup.classList.add('show');
-                setTimeout(() => { memoryPopup.classList.remove('show'); }, 3000);
-
-                lastStar = star;
+            // --- 1. CUSTOM CURSOR & MOUSE GLOW ---
+            const cursorGlow = document.querySelector('.cursor-glow');
+            document.addEventListener('mousemove', (e) => {
+                cursorGlow.style.left = e.clientX + 'px';
+                cursorGlow.style.top = e.clientY + 'px';
             });
-        });
-    }
 
-});
-</script>
+            // --- 2. GENERATE BACKGROUND STARS ---
+            const starsContainer = document.getElementById('stars-container');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star-bg';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 4 + 's';
+                starsContainer.appendChild(star);
+            }
+
+            // --- 3. SCROLL-REVEAL ANIMATIONS ---
+            const scenes = document.querySelectorAll('.scene');
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.3
+            };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+            scenes.forEach(scene => observer.observe(scene));
+
+            // --- 4. SOUND CONTROL ---
+            const soundToggle = document.getElementById('sound-toggle');
+            const ambientSound = document.getElementById('ambient-sound');
+            let isSoundOn = false;
+            soundToggle.addEventListener('click', () => {
+                if (isSoundOn) {
+                    ambientSound.pause();
+                    soundToggle.textContent = '🔇';
+                } else {
+                    ambientSound.play().catch(e => console.error("Audio play failed:", e));
+                    soundToggle.textContent = '🔊';
+                }
+                isSoundOn = !isSoundOn;
+            });
+
+        });
+    </script>
 </body>
 </html>
