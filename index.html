@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Universe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CUSTOMIZE COLORS HERE --- */
+        :root {
+            --bg-dark: #0a0a0f;
+            --text-primary: #f0f0f0;
+            --accent-color: #a78bfa; /* A soft purple */
+            --accent-glow: #c084fc; /* A brighter purple for glow effects */
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Lato', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            cursor: none; /* Custom cursor */
+        }
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 4rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.2rem;
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        /* --- Custom Cursor & Glow --- */
+        .cursor-glow {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(192, 132, 252, 0.1) 0%, rgba(10, 10, 15, 0) 70%);
+            position: fixed;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 9998;
+            transition: opacity 0.3s ease;
+        }
+
+        /* --- Sound Toggle --- */
+        #sound-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: background 0.3s, transform 0.2s;
+        }
+        #sound-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* --- Scene Layout --- */
+        .scene {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content {
+            text-align: center;
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1.5s ease, transform 1.5s ease;
+        }
+        .scene.visible .content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Background Stars --- */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .star-bg {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 4s infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* --- Section 1: The Void --- */
+        #void .distant-light {
+            width: 5px;
+            height: 5px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.5);
+            animation: pulse 3s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.5); opacity: 1; }
+        }
+
+        /* --- Section 2: The Supernova --- */
+        .explosion {
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, #fff, var(--accent-glow), transparent);
+            border-radius: 50%;
+            position: absolute;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 2s ease-out;
+        }
+        #supernova.visible .explosion {
+            opacity: 1;
+            transform: scale(50);
+        }
+
+        /* --- Section 3: The Black Hole Portal --- */
+        .portal-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: var(--accent-glow);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 400;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .portal-link:hover {
+            border-bottom-color: var(--accent-glow);
+            transform: translateY(-2px);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .blackhole {
+            width: 250px;
+            height: 250px;
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .event-horizon {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #000000 30%, #1a0033 70%);
+            border-radius: 50%;
+            position: absolute;
+            z-index: 2;
+            box-shadow: 0 0 50px 10px #000000;
+            animation: event-horizon-pulse 4s infinite ease-in-out;
+        }
+
+        .accretion-disk {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            position: absolute;
+            background: conic-gradient(
+                from 0deg,
+                transparent,
+                var(--accent-color),
+                var(--accent-glow),
+                #fbbf24,
+                var(--accent-color),
+                transparent
+            );
+            animation: spin 10s linear infinite;
+            filter: blur(3px);
+            opacity: 0.8;
+        }
+        .accretion-disk::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: var(--bg-dark);
+            border-radius: 50%;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes event-horizon-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+        }
+
+        /* --- Section 4: The Center --- */
+        .planet {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: absolute;
+            box-shadow: 0 0 60px 20px rgba(102, 126, 234, 0.6),
+                        inset -20px -20px 40px rgba(0, 0, 0, 0.5);
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            p { font-size: 1rem; }
+            .planet { width: 200px; height: 200px; }
+            .blackhole { width: 180px; height: 180px; }
+            .accretion-disk { width: 160px; height: 160px; }
+            .event-horizon { width: 70px; height: 70px; }
+            .cursor-glow { display: none; } /* Hide custom cursor on mobile */
+            body { cursor: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- --- PERSONALIZE THIS: Add your own sound file --- -->
+    <!-- Find a royalty-free ambient space track, save it as 'cosmos.mp3' in the same folder as this HTML file -->
+    <audio id="ambient-sound" loop>
+        <source src="cosmos.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <button id="sound-toggle">🔇</button>
+
+    <div class="stars-container" id="stars-container"></div>
+    <div class="cursor-glow"></div>
+
+    <main>
+        <!-- Section 1: The Void -->
+        <section id="void" class="scene">
+            <div class="content">
+                <h1>Before you...</h1>
+                <p>...my universe was a quiet, infinite void.</p>
+            </div>
+            <div class="distant-light"></div>
+        </section>
+
+        <!-- Section 2: The Supernova -->
+        <section id="supernova" class="scene">
+            <div class="content">
+                <h1>Then...</h1>
+                <p>A supernova.</p>
+            </div>
+            <div class="explosion"></div>
+        </section>
+
+        <!-- Section 3: The Black Hole Portal -->
+        <section id="blackhole-portal" class="scene">
+            <div class="content">
+                <h1>The Center of My Universe</h1>
+                <p>A gravitational pull towards everything beautiful.</p>
+                <!-- --- PERSONALIZE THIS: Replace with the link to your stars page --- -->
+                <a href="index1.html" class="portal-link">Click here to watch the stars of you →</a>
+            </div>
+            <div class="blackhole">
+                <div class="accretion-disk"></div>
+                <div class="event-horizon"></div>
+            </div>
+        </section>
+
+        <!-- Section 4: The Center -->
+        <section id="center" class="scene">
+            <div class="content">
+                <!-- --- PERSONALIZE THIS: Replace with your girlfriend's name --- -->
+                <h1>Unnati</h1>
+                <p>You are my gravity, my light, my entire cosmos.</p>
+            </div>
+            <div class="planet"></div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 1. CUSTOM CURSOR & MOUSE GLOW ---
+            const cursorGlow = document.querySelector('.cursor-glow');
+            document.addEventListener('mousemove', (e) => {
+                cursorGlow.style.left = e.clientX + 'px';
+                cursorGlow.style.top = e.clientY + 'px';
+            });
+
+            // --- 2. GENERATE BACKGROUND STARS ---
+            const starsContainer = document.getElementById('stars-container');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star-bg';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 4 + 's';
+                starsContainer.appendChild(star);
+            }
+
+            // --- 3. SCROLL-REVEAL ANIMATIONS ---
+            const scenes = document.querySelectorAll('.scene');
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.3
+            };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+            scenes.forEach(scene => observer.observe(scene));
+
+            // --- 4. SOUND CONTROL ---
+            const soundToggle = document.getElementById('sound-toggle');
+            const ambientSound = document.getElementById('ambient-sound');
+            let isSoundOn = false;
+            soundToggle.addEventListener('click', () => {
+                if (isSoundOn) {
+                    ambientSound.pause();
+                    soundToggle.textContent = '🔇';
+                } else {
+                    ambientSound.play().catch(e => console.error("Audio play failed:", e));
+                    soundToggle.textContent = '🔊';
+                }
+                isSoundOn = !isSoundOn;
+            });
+
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Personal Universe of Comfort</title>
+    
+    <!-- ===== FONTS ===== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- ===== CSS STYLES ===== -->
+    <style>
+        /* --- Global Styles & Theme --- */
+        :root {
+            --bg-dark: #0a0a1f;
+            --text-light: #f0f0f0;
+            --accent-warm: #ffb6c1;
+            --accent-soft: #d4a5a5;
+            --accent-gentle: #e8b4b8;
+            --accent-cozy: #f4c2c2;
+            --accent-hug: #ffd1dc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comfortaa', cursive;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            overflow: hidden;
+            cursor: none;
+        }
+
+        /* --- Custom Cursor --- */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-warm);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
+            z-index: 9999;
+            mix-blend-mode: difference;
+        }
+        
+        .cursor-follower {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+            z-index: 9998;
+        }
+        
+        .cursor.hover {
+            transform: translate(-50%, -50%) scale(2);
+            background-color: rgba(255, 182, 193, 0.3);
+            border-color: var(--accent-warm);
+        }
+
+        /* --- Universe & Stars --- */
+        .universe {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .universe::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffeaa7, transparent),
+                radial-gradient(2px 2px at 40px 70px, #fff, transparent),
+                radial-gradient(1px 1px at 50px 50px, #ffe4e1, transparent),
+                radial-gradient(1px 1px at 80px 10px, #fff, transparent),
+                radial-gradient(2px 2px at 130px 80px, #ffd1dc, transparent),
+                radial-gradient(1px 1px at 110px 120px, #ffe4e1, transparent);
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: starfield-drift 200s linear infinite;
+            opacity: 0.5;
+        }
+        
+        /* --- Shooting Stars --- */
+        .shooting-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+            animation: shooting 3s linear infinite;
+            opacity: 0;
+        }
+        
+        .shooting-star::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(to left, transparent, rgba(255, 255, 255, 0.8));
+            transform: translateX(-100px);
+        }
+        
+        @keyframes shooting {
+            0% {
+                transform: translateX(0) translateY(0) rotate(-45deg);
+                opacity: 0;
+            }
+            5% {
+                opacity: 1;
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-500px) translateY(300px) rotate(-45deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes starfield-drift {
+            from { transform: translateX(0); }
+            to { transform: translateX(-200px); }
+        }
+
+        .constellation {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+        
+        /* --- Constellation Lines --- */
+        .constellation-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none;
+        }
+        
+        .constellation-line {
+            position: absolute;
+            background: linear-gradient(to right, transparent, rgba(255, 182, 193, 0.3), transparent);
+            height: 1px;
+            transform-origin: left center;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        
+        .constellation:hover .constellation-line {
+            opacity: 1;
+        }
+
+        .star {
+            position: absolute;
+            text-decoration: none;
+            text-align: center;
+            transition: transform 0.4s ease;
+            z-index: 20;
+        }
+        .star:hover {
+            transform: scale(1.15);
+            z-index: 25;
+        }
+
+        .star-icon {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            display: block;
+            color: var(--text-light);
+            text-shadow: 0 0 15px #fff, 0 0 25px #fff, 0 0 35px var(--accent-warm);
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        .star-label {
+            font-family: 'Comfortaa', cursive;
+            font-size: 1rem;
+            display: block;
+            margin-top: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            transition: color 0.3s ease, opacity 0.3s ease;
+        }
+        .star:hover .star-label {
+            color: var(--text-light);
+            opacity: 1;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { text-shadow: 0 0 15px #fff, 0 0 25px #fff, 0 0 35px var(--accent-warm); }
+            50% { text-shadow: 0 0 20px #fff, 0 0 30px #fff, 0 0 45px var(--accent-warm); }
+        }
+
+        /* --- The "Worlds" (Hover States) --- */
+        .world {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease-in-out, visibility 0s 1s;
+            z-index: 5;
+        }
+        .world.active {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 1s ease-in-out, visibility 0s;
+        }
+        .world.active ~ .constellation .star {
+            opacity: 0.1;
+        }
+        .world.active ~ .constellation .star:hover {
+            opacity: 0.5;
+        }
+
+        .world-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out 0.5s, transform 0.8s ease-out 0.5s;
+        }
+        .world.active .world-title {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .world-description {
+            font-size: 1.2rem;
+            max-width: 600px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out 0.7s, transform 0.8s ease-out 0.7s;
+        }
+        .world.active .world-description {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .world-quote {
+            font-style: italic;
+            margin-top: 1.5rem;
+            font-size: 1rem;
+            max-width: 500px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out 0.9s, transform 0.8s ease-out 0.9s;
+        }
+        .world.active .world-quote {
+            opacity: 0.8;
+            transform: translateY(0);
+        }
+
+        /* --- Individual World Designs --- */
+        #world-comfort { 
+            background: radial-gradient(ellipse at center, #ffeaa7, #fdcb6e, #f39c12);
+            animation: gentle-pulse 10s infinite alternate;
+        }
+        #world-comfort .world-title { color: #2d3436; }
+        #world-comfort .world-description { color: #2d3436; }
+        #world-comfort .world-quote { color: #2d3436; }
+
+        #world-safety { 
+            background: radial-gradient(ellipse at center, #ffb6c1, #f4c2c2, #ffd1dc);
+            animation: gentle-pulse 8s infinite alternate;
+        }
+        #world-safety .world-title { color: #2d3436; }
+        #world-safety .world-description { color: #2d3436; }
+        #world-safety .world-quote { color: #2d3436; }
+
+        #world-peace { 
+            background: radial-gradient(ellipse at center, #a8e6cf, #81c784, #66bb6a);
+            animation: gentle-pulse 12s infinite alternate;
+        }
+        #world-peace .world-title { color: #2d3436; }
+        #world-peace .world-description { color: #2d3436; }
+        #world-peace .world-quote { color: #2d3436; }
+
+        #world-belonging { 
+            background: radial-gradient(ellipse at center, #d4a5a5, #e8b4b8, #f4c2c2);
+            animation: gentle-pulse 9s infinite alternate;
+        }
+        #world-belonging .world-title { color: #2d3436; }
+        #world-belonging .world-description { color: #2d3436; }
+        #world-belonging .world-quote { color: #2d3436; }
+
+        #world-warmth { 
+            background: radial-gradient(ellipse at center, #fab1a0, #e17055, #d63031);
+            animation: gentle-pulse 11s infinite alternate;
+        }
+        #world-warmth .world-title { color: #2d3436; }
+        #world-warmth .world-description { color: #2d3436; }
+        #world-warmth .world-quote { color: #2d3436; }
+        
+        #world-gentleness { 
+            background: radial-gradient(ellipse at center, #e8b4b8, #f4c2c2, #ffd1dc);
+            animation: gentle-pulse 10s infinite alternate;
+        }
+        #world-gentleness .world-title { color: #2d3436; }
+        #world-gentleness .world-description { color: #2d3436; }
+        #world-gentleness .world-quote { color: #2d3436; }
+        
+        #world-understanding { 
+            background: radial-gradient(ellipse at center, #b4a7d6, #a393eb, #9b88d9);
+            animation: gentle-pulse 13s infinite alternate;
+        }
+        #world-understanding .world-title { color: #2d3436; }
+        #world-understanding .world-description { color: #2d3436; }
+        #world-understanding .world-quote { color: #2d3436; }
+        
+        #world-acceptance { 
+            background: radial-gradient(ellipse at center, #c7ceea, #b2b7e0, #a5a9d4);
+            animation: gentle-pulse 8s infinite alternate;
+        }
+        #world-acceptance .world-title { color: #2d3436; }
+        #world-acceptance .world-description { color: #2d3436; }
+        #world-acceptance .world-quote { color: #2d3436; }
+        
+        #world-tenderness { 
+            background: radial-gradient(ellipse at center, #ffd1dc, #ffb6c1, #f4c2c2);
+            animation: gentle-pulse 11s infinite alternate;
+        }
+        #world-tenderness .world-title { color: #2d3436; }
+        #world-tenderness .world-description { color: #2d3436; }
+        #world-tenderness .world-quote { color: #2d3436; }
+        
+        @keyframes gentle-pulse {
+            0% { background-size: 100% 100%; }
+            100% { background-size: 110% 110%; }
+        }
+        
+        /* --- Nebula Effect --- */
+        .nebula {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.1;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .nebula-1 {
+            background: radial-gradient(circle, var(--accent-warm), transparent);
+            top: -100px;
+            left: -100px;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+        
+        .nebula-2 {
+            background: radial-gradient(circle, var(--accent-soft), transparent);
+            bottom: -100px;
+            right: -100px;
+            animation: float 25s infinite alternate-reverse ease-in-out;
+        }
+        
+        .nebula-3 {
+            background: radial-gradient(circle, var(--accent-gentle), transparent);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: float 30s infinite alternate ease-in-out;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+            100% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        
+        /* --- Navigation --- */
+        .back-button {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            font-size: 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--text-light);
+            border-radius: 50px;
+            transition: background-color 0.3s, color 0.3s;
+            z-index: 100;
+        }
+        .back-button:hover {
+            background-color: var(--text-light);
+            color: var(--bg-dark);
+        }
+        .back-button span {
+            margin-right: 0.5rem;
+        }
+        
+        /* --- Controls --- */
+        .controls {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+        
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: none;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .control-btn.active {
+            background: rgba(255, 182, 193, 0.3);
+            border-color: var(--accent-warm);
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .star-icon { font-size: 2.5rem; }
+            .star-label { font-size: 0.8rem; }
+            .world-title { font-size: 2.5rem; }
+            .world-description { font-size: 1rem; }
+            .cursor, .cursor-follower { display: none; }
+            body { cursor: auto; }
+            .nebula { 
+                width: 400px; 
+                height: 400px; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-button"><span>←</span> Back to Your Universe</a>
+
+    <!-- Custom Cursor Elements -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+    
+    <!-- Nebula Effects -->
+    <div class="nebula nebula-1"></div>
+    <div class="nebula nebula-2"></div>
+    <div class="nebula nebula-3"></div>
+
+    <main class="universe">
+        <!-- Shooting Stars -->
+        <div class="shooting-star" style="top: 20%; left: 80%; animation-delay: 0s;"></div>
+        <div class="shooting-star" style="top: 40%; left: 60%; animation-delay: 5s;"></div>
+        <div class="shooting-star" style="top: 60%; left: 40%; animation-delay: 10s;"></div>
+        
+        <!-- The "Worlds" are overlays that appear on hover -->
+        <div id="world-comfort" class="world">
+            <h2 class="world-title">Comfort</h2>
+            <p class="world-description">Like being wrapped in your favorite blanket on a rainy day. This world holds all the gentle moments that make your heart feel safe and your shoulders relax. Every breeze here whispers "it's okay to rest."</p>
+            <p class="world-quote"></p>
+        </div>
+        <div id="world-safety" class="world">
+            <h2 class="world-title">Safety</h2>
+            <p class="world-description">The feeling of coming home after a long day. In this world, doors are always open, arms are always ready to catch you, and you never have to be afraid of being yourself.</p>
+            <p class="world-quote"></p>
+        </div>
+        <div id="world-peace" class="world">
+            <h2 class="world-title">Peace</h2>
+            <p class="world-description">That quiet moment when everything feels just right. Like sitting by a window , watching the world go by without needing to be part of it. Here, your mind can finally breathe.</p>
+            <p class="world-quote"></p>
+        </div>
+        <div id="world-belonging" class="world">
+            <h2 class="world-title">Belonging</h2>
+            <p class="world-description">The warmth of being seen and loved for exactly who you are. This world is filled with spaces where you fit perfectly, where your presence matters, and where you never have to pretend.</p>
+            <p class="world-quote"></p>
+        </div>
+        <div id="world-warmth" class="world">
+            <h2 class="world-title">Warmth</h2>
+            <p class="world-description">Like sunshine on your skin and a hug that lasts just a little longer. This world radiates the kind of heat that comes from caring hearts and shared moments, melting away all the cold.</p>
+            <p class="world-quote"></p>
+        </div>
+        <div id="world-gentleness" class="world">
+            <h2 class="world-title">Gentleness</h2>
+            <p class="world-description">The soft touch that heals without words. In this world, everything moves slowly, voices are hushed, and there's always a gentle hand to guide you through the dark.</p>
+            <p class="world-quote"></p>
+        </div>
+        <div id="world-understanding" class="world">
+            <h2 class="world-title">Understanding</h2>
+            <p class="world-description">That beautiful moment when someone just gets it. This world is built from bridges between hearts, where differences are celebrated and everyone's story matters.</p>
+            <p class="world-quote"></p>
+        </div>
+        <div id="world-acceptance" class="world">
+            <h2 class="world-title">Acceptance</h2>
+            <p class="world-description">The relief of being enough, exactly as you are. Here, there are no conditions to meet, no boxes to fit into, just the pure joy of being welcomed with open arms.</p>
+            <p class="world-quote"></p>
+        </div>
+        <div id="world-tenderness" class="world">
+            <h2 class="world-title">Tenderness</h2>
+            <p class="world-description">Like holding something precious and fragile with infinite care. This world is made of soft moments, gentle words, and the kind of love that protects without smothering.</p>
+            <p class="world-quote"></p>
+        </div>
+
+        <!-- The Constellation of Comforting Qualities -->
+        <div class="constellation">
+            <!-- Constellation Lines -->
+            <div class="constellation-lines">
+                <!-- Lines will be drawn dynamically with JavaScript -->
+            </div>
+            
+            <!-- Spread out the stars across the viewport -->
+            <a href="#" class="star" data-target="world-comfort" style="top: 20%; left: 15%;">
+                <span class="star-icon">✦</span>
+                <span class="star-label">Comfort</span>
+            </a>
+            <a href="#" class="star" data-target="world-safety" style="top: 15%; left: 80%;">
+                <span class="star-icon">✦</span>
+                <span class="star-label">Safety</span>
+            </a>
+            <a href="#" class="star" data-target="world-peace" style="top: 75%; left: 75%;">
+                <span class="star-icon">✦</span>
+                <span class="star-label">Peace</span>
+            </a>
+            <a href="#" class="star" data-target="world-belonging" style="top: 70%; left: 20%;">
+                <span class="star-icon">✦</span>
+                <span class="star-label">Belonging</span>
+            </a>
+            <a href="#" class="star" data-target="world-warmth" style="top: 45%; left: 50%;">
+                <span class="star-icon">✦</span>
+                <span class="star-label">Warmth</span>
+            </a>
+            <a href="#" class="star" data-target="world-gentleness" style="top: 30%; left: 45%;">
+                <span class="star-icon">✦</span>
+                <span class="star-label">Gentleness</span>
+            </a>
+            <a href="#" class="star" data-target="world-understanding" style="top: 60%; left: 40%;">
+                <span class="star-icon">✦</span>
+                <span class="star-label">Understanding</span>
+            </a>
+            <a href="#" class="star" data-target="world-acceptance" style="top: 40%; left: 70%;">
+                <span class="star-icon">✦</span>
+                <span class="star-label">Acceptance</span>
+            </a>
+            <a href="#" class="star" data-target="world-tenderness" style="top: 55%; left: 60%;">
+                <span class="star-icon">✦</span>
+                <span class="star-label">Tenderness</span>
+            </a>
+        </div>
+    </main>
+    
+    <!-- Controls -->
+    <div class="controls">
+        <div class="control-btn" id="toggle-lines" title="Toggle Constellation Lines">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </div>
+        <div class="control-btn" id="toggle-nebula" title="Toggle Nebula Effects">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+            </svg>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Custom Cursor Logic ---
+            const cursor = document.querySelector('.cursor');
+            const cursorFollower = document.querySelector('.cursor-follower');
+            const clickableElements = document.querySelectorAll('a, button, .star, .control-btn');
+
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+                setTimeout(() => {
+                    cursorFollower.style.left = e.clientX + 'px';
+                    cursorFollower.style.top = e.clientY + 'px';
+                }, 100);
+            });
+
+            clickableElements.forEach(element => {
+                element.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+                element.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+            });
+            
+            document.addEventListener('mouseleave', () => {
+                cursor.style.display = 'none';
+                cursorFollower.style.display = 'none';
+            });
+            document.addEventListener('mouseenter', () => {
+                cursor.style.display = 'block';
+                cursorFollower.style.display = 'block';
+            });
+
+            // --- World Transition Logic ---
+            const stars = document.querySelectorAll('.star');
+            const worlds = document.querySelectorAll('.world');
+            let currentWorld = null;
+
+            stars.forEach(star => {
+                star.addEventListener('mouseenter', () => {
+                    const targetId = star.getAttribute('data-target');
+                    if (currentWorld) {
+                        currentWorld.classList.remove('active');
+                    }
+                    currentWorld = document.getElementById(targetId);
+                    if (currentWorld) {
+                        currentWorld.classList.add('active');
+                    }
+                });
+
+                star.addEventListener('mouseleave', () => {
+                    if (currentWorld) {
+                        currentWorld.classList.remove('active');
+                    }
+                });
+            });
+            
+            // --- Draw Constellation Lines ---
+            function drawConstellationLines() {
+                const constellationLines = document.querySelector('.constellation-lines');
+                const starElements = document.querySelectorAll('.star');
+                
+                // Define which stars should be connected
+                const connections = [
+                    [0, 1], [0, 4], [1, 4], [1, 7], [2, 3], [2, 4], 
+                    [3, 4], [3, 6], [4, 5], [4, 6], [4, 7], [4, 8],
+                    [5, 7], [6, 8], [7, 8]
+                ];
+                
+                connections.forEach(([startIdx, endIdx]) => {
+                    const startStar = starElements[startIdx];
+                    const endStar = starElements[endIdx];
+                    
+                    if (startStar && endStar) {
+                        const line = document.createElement('div');
+                        line.classList.add('constellation-line');
+                        
+                        // Calculate line position and angle
+                        const startRect = startStar.getBoundingClientRect();
+                        const endRect = endStar.getBoundingClientRect();
+                        
+                        const startX = startRect.left + startRect.width / 2;
+                        const startY = startRect.top + startRect.height / 2;
+                        const endX = endRect.left + endRect.width / 2;
+                        const endY = endRect.top + endRect.height / 2;
+                        
+                        const distance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                        const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+                        
+                        line.style.width = `${distance}px`;
+                        line.style.left = `${startX}px`;
+                        line.style.top = `${startY}px`;
+                        line.style.transform = `rotate(${angle}deg)`;
+                        
+                        constellationLines.appendChild(line);
+                    }
+                });
+            }
+            
+            // Initial draw
+            drawConstellationLines();
+            
+            // Redraw on window resize
+            window.addEventListener('resize', () => {
+                document.querySelector('.constellation-lines').innerHTML = '';
+                drawConstellationLines();
+            });
+            
+            // --- Toggle Controls ---
+            const toggleLinesBtn = document.getElementById('toggle-lines');
+            const toggleNebulaBtn = document.getElementById('toggle-nebula');
+            const constellationLines = document.querySelector('.constellation-lines');
+            const nebulae = document.querySelectorAll('.nebula');
+            
+            toggleLinesBtn.addEventListener('click', () => {
+                constellationLines.style.display = constellationLines.style.display === 'none' ? 'block' : 'none';
+                toggleLinesBtn.classList.toggle('active');
+            });
+            
+            toggleNebulaBtn.addEventListener('click', () => {
+                nebulae.forEach(nebula => {
+                    nebula.style.display = nebula.style.display === 'none' ? 'block' : 'none';
+                });
+                toggleNebulaBtn.classList.toggle('active');
+            });
+            
+            // --- Add More Shooting Stars Dynamically ---
+            function createShootingStar() {
+                const shootingStar = document.createElement('div');
+                shootingStar.classList.add('shooting-star');
+                
+                // Random position
+                const top = Math.random() * 50 + '%';
+                const left = Math.random() * 80 + 20 + '%';
+                const delay = Math.random() * 20 + 's';
+                
+                shootingStar.style.top = top;
+                shootingStar.style.left = left;
+                shootingStar.style.animationDelay = delay;
+                
+                document.querySelector('.universe').appendChild(shootingStar);
+                
+                // Remove after animation completes
+                setTimeout(() => {
+                    shootingStar.remove();
+                }, 23000); // 20s animation + 3s buffer
+            }
+            
+            // Create additional shooting stars periodically
+            setInterval(createShootingStar, 15000);
+            
+            // --- Parallax Effect on Mouse Move ---
+            document.addEventListener('mousemove', (e) => {
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+                
+                const nebula1 = document.querySelector('.nebula-1');
+                const nebula2 = document.querySelector('.nebula-2');
+                const nebula3 = document.querySelector('.nebula-3');
+                
+                if (nebula1) {
+                    nebula1.style.transform = `translate(${x * 20}px, ${y * 20}px)`;
+                }
+                if (nebula2) {
+                    nebula2.style.transform = `translate(${-x * 15}px, ${-y * 15}px)`;
+                }
+                if (nebula3) {
+                    nebula3.style.transform = `translate(${-x * 10}px, ${y * 10}px)`;
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
