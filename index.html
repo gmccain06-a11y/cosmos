@@ -265,8 +265,11 @@
 
     <!-- --- PERSONALIZE THIS: Add your own sound file --- -->
     <!-- Find a royalty-free ambient space track, save it as 'cosmos.mp3' in the same folder as this HTML file -->
-    
-    <button id="sound-toggle">🔇</button>
+    <!-- Add this line -->
+<iframe src="play.html" id="music-player" style="display:none;"></iframe>
+
+<!-- This button was already there -->
+<button id="sound-toggle">🔇</button>
 
     <div class="stars-container" id="stars-container"></div>
     <div class="cursor-glow"></div>
@@ -321,38 +324,41 @@
     </div>
 
 <script>
-
 document.addEventListener('DOMContentLoaded', () => {
-      const soundToggle = document.getElementById('sound-toggle');
-    let isSoundOn = false;
+
+    // --- 1. MUSIC CONTINUITY LOGIC (iframe method) ---
+    const soundToggle = document.getElementById('sound-toggle');
+    let isMusicPlaying = false;
 
     soundToggle.addEventListener('click', () => {
-        // Get the iframe's window and call the function inside it
         const musicFrame = document.getElementById('music-player').contentWindow;
-        musicFrame.toggleMusic();
+        
+        // Check if the iframe has loaded before trying to call its function
+        if (musicFrame && musicFrame.toggleMusic) {
+            musicFrame.toggleMusic(); // Call the function inside play.html
 
-        // Update the button icon
-        if (isSoundOn) {
-            soundToggle.textContent = '🔇';
+            // Update the button icon on the main page
+            if (isMusicPlaying) {
+                soundToggle.textContent = '🔇';
+            } else {
+                soundToggle.textContent = '🔊';
+            }
+            isMusicPlaying = !isMusicPlaying;
         } else {
-            soundToggle.textContent = '🔊';
+            console.error("Music player iframe not ready yet.");
         }
-        isSoundOn = !isSoundOn;
     });
 
-    // --- Add any other scripts for this page below ---
-});
 
-
-    // --- ALL THE CODE BELOW IS THE SAME AS BEFORE ---
-    // --- (Custom Cursor, Stars, Scroll-Reveal, Constellation) ---
-
+    // --- 2. CUSTOM CURSOR LOGIC ---
     const cursorGlow = document.querySelector('.cursor-glow');
     document.addEventListener('mousemove', (e) => {
         cursorGlow.style.left = e.clientX + 'px';
         cursorGlow.style.top = e.clientY + 'px';
     });
 
+
+    // --- 3. BACKGROUND STARS ---
     const starsContainer = document.getElementById('stars-container');
     for (let i = 0; i < 150; i++) {
         const star = document.createElement('div');
@@ -363,6 +369,8 @@ document.addEventListener('DOMContentLoaded', () => {
         starsContainer.appendChild(star);
     }
 
+
+    // --- 4. SCROLL-REVEAL ANIMATIONS ---
     const scenes = document.querySelectorAll('.scene');
     const observerOptions = { root: null, rootMargin: '0px', threshold: 0.3 };
     const observer = new IntersectionObserver((entries) => {
@@ -374,6 +382,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }, observerOptions);
     scenes.forEach(scene => observer.observe(scene));
 
+
+    // --- 5. INTERACTIVE CONSTELLATION (if you have a constellation section) ---
     const constellationSection = document.getElementById('constellation');
     if (constellationSection) {
         const stars = constellationSection.querySelectorAll('.star');
@@ -417,6 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+});
 </script>
 </body>
 </html>
