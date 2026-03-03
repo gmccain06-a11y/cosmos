@@ -3,18 +3,19 @@
 <head>
     <title>Music Player</title>
     <style>
-        body, html { margin: 0; padding: 0; overflow: hidden; background: transparent; }
+        body, html { margin: 0; padding: 0; overflow: hidden; }
     </style>
 </head>
 <body>
-    <!-- IMPORTANT: Make sure the src path is correct from this file's location! -->
+    <!-- IMPORTANT: Make sure the path to your song is correct! -->
     <audio id="ambient-sound" loop>
         <source src="cosmos.mp3" type="audio/mpeg">
     </audio>
 
     <script>
         const audio = document.getElementById('ambient-sound');
-        // We'll let the main page control play/pause
+        
+        // This function will be called from your main page
         function toggleMusic() {
             if (audio.paused) {
                 audio.play();
