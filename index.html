@@ -265,10 +265,7 @@
 
     <!-- --- PERSONALIZE THIS: Add your own sound file --- -->
     <!-- Find a royalty-free ambient space track, save it as 'cosmos.mp3' in the same folder as this HTML file -->
-    <audio id="ambient-sound" loop>
-        <source src="cosmos.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
+    
     <button id="sound-toggle">🔇</button>
 
     <div class="stars-container" id="stars-container"></div>
@@ -324,65 +321,27 @@
     </div>
 
 <script>
-    // This is the new, complete script. Use this for the replacement.
-document.addEventListener('DOMContentLoaded', () => {
 
-    // --- THIS IS THE NEW PART FOR MUSIC CONTINUITY ---
-    const ambientSound = document.getElementById('ambient-sound');
-    const soundToggle = document.getElementById('sound-toggle');
-    const SAVED_TIME_KEY = 'savedAudioTime';
-    const SOUND_STATE_KEY = 'isSoundOn';
+document.addEventListener('DOMContentLoaded', () => {
+      const soundToggle = document.getElementById('sound-toggle');
     let isSoundOn = false;
 
-    // This function saves the music's current time and playing state
-    function saveAudioState() {
-        if (isSoundOn) {
-            localStorage.setItem(SAVED_TIME_KEY, ambientSound.currentTime);
-            localStorage.setItem(SOUND_STATE_KEY, 'true');
-        } else {
-            localStorage.setItem(SOUND_STATE_KEY, 'false');
-        }
-    }
-
-    // This function loads the saved state when the page opens
-    function loadAudioState() {
-        const savedTime = parseFloat(localStorage.getItem(SAVED_TIME_KEY)) || 0;
-        const savedSoundState = localStorage.getItem(SOUND_STATE_KEY) === 'true';
-        
-        ambientSound.currentTime = savedTime;
-
-        if (savedSoundState) {
-            ambientSound.play().catch(e => console.error("Autoplay failed:", e));
-            soundToggle.textContent = '🔊';
-            isSoundOn = true;
-        } else {
-            soundToggle.textContent = '🔇';
-            isSoundOn = false;
-        }
-    }
-
-    // Load the state when the page first loads
-    loadAudioState();
-
-    // Save the state every second while the page is open
-    setInterval(saveAudioState, 1000); 
-    
-    // Save the state right before the user leaves the page
-    window.addEventListener('beforeunload', saveAudioState);
-
-    // --- THIS IS THE MODIFIED SOUND TOGGLE LOGIC ---
-    // It now also calls saveAudioState() when you click it.
     soundToggle.addEventListener('click', () => {
+        // Get the iframe's window and call the function inside it
+        const musicFrame = document.getElementById('music-player').contentWindow;
+        musicFrame.toggleMusic();
+
+        // Update the button icon
         if (isSoundOn) {
-            ambientSound.pause();
             soundToggle.textContent = '🔇';
         } else {
-            ambientSound.play().catch(e => console.error("Audio play failed:", e));
             soundToggle.textContent = '🔊';
         }
         isSoundOn = !isSoundOn;
-        saveAudioState(); // <-- NEW LINE: Save state immediately on toggle
     });
+
+    // --- Add any other scripts for this page below ---
+});
 
 
     // --- ALL THE CODE BELOW IS THE SAME AS BEFORE ---
